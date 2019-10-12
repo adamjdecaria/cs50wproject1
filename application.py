@@ -124,3 +124,16 @@ def logout():
 
     # Redirect user to login form
     return redirect("/")
+
+@app.route("/search", methods= ["POST"])
+def search():
+    """Search for books from Goodreads API using ISBN, title or author"""
+
+    if request.form.get("isbn"):
+        search_term = request.form.get("isbn")
+    elif request.form.get("title"):
+        search_term = request.form.get("title")
+    elif request.form.get("author"):
+        search_term = request.form.get("author")
+    else:
+        return render_template("error.html", message = "Please enter an ISBN, book title or author name.")

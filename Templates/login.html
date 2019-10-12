@@ -10,7 +10,7 @@
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
-                 <div class="alert alert-success" role="alert"><div class="text-center">{{ messages }}</div></div>
+                 <div class="alert alert-success" role="alert"><div class="text-center">{{ messages }}</div>
             {% endfor %}
         {% endif %}
     {% endwith %}
@@ -34,5 +34,4 @@
           <button class="btn btn-primary" type="submit">Log In</button>
       </form>
     </div>
-
 {% endblock %}

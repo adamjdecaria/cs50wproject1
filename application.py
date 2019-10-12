@@ -110,7 +110,7 @@ def login():
         # remember the username of the user logged in
         session["username"] = result[0]["username"]
 
-        return render_template("error.html", message="Logged in!")
+        return render_template("search.html", message="Logged in!")
 
     else:
         return render_template("login.html")

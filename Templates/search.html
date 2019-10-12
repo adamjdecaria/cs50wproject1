@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Search
+{% endblock %}
+
+{% block main %}
+
+    <br>
+    <br>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert"><div class="text-center">{{ messages }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <br>
+    <br>
+    <div class="search">
+    <p style="text-align:center;">
+    <h2>Please enter details of the book you would like to search for</h2>
+    </p>
+    <br>
+    </div>
+    <div class="col-sm-5">
+        <form action="/search" method="post">
+            <div class="form-group">
+                <input autocomplete="off" autofocus class="form-control" name="isbn" placeholder="ISBN" type="text">
+            </div>
+            <div class="form-group">
+                <input autocomplete="off" autofocus class="form-control" name="title" placeholder="Title" type="text">
+            </div>
+            <div class="form-group">
+                <input autocomplete="off" autofocus class="form-control" name="author" placeholder="Author" type="text">
+            </div>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+    </div>
+{% endblock %}

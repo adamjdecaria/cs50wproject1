@@ -130,10 +130,42 @@ def search():
     """Search for books from Goodreads API using ISBN, title or author"""
 
     if request.form.get("isbn"):
-        search_term = request.form.get("isbn")
+        isbn = request.form.get("isbn")
+
+        try:
+            result = db.execute("SELECT * FROM books WHERE (isbn=:isbn)", {"isbn":isbn}).fetchall()
+            print("Search Completed")
+            print(result)
+
+        except exc.IntegrityError as e:
+            error_message = "Unable to find anything."
+            return render_template("error.html", message=error_message)
+       
     elif request.form.get("title"):
-        search_term = request.form.get("title")
+        title = request.form.get("title")
+
+        try:
+            result = db.execute("SELECT * FROM books WHERE (title=:title)", {"title":title}).fetchall()
+            print("Search Completed")
+            print(result)
+
+        except exc.IntegrityError as e:
+            error_message = "Unable to find anything."
+            return render_template("error.html", message=error_message)
+
     elif request.form.get("author"):
-        search_term = request.form.get("author")
+        author = request.form.get("author")
+
+        try:
+            result = db.execute("SELECT * FROM books WHERE (author=:author)", {"author":author}).fetchall()
+            print("Search Completed")
+            print(result)
+
+        except exc.IntegrityError as e:
+            error_message = "Unable to find anything."
+            return render_template("error.html", message=error_message)
+    
     else:
-        return render_template("error.html", message = "Please enter an ISBN, book title or author name.")
+        return("error.html")
+    
+    return render_template("search.html")

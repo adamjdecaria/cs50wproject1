@@ -19,22 +19,54 @@
     <br>
     <div class="search">
     <p style="text-align:center;">
-    <h2>Please enter details of the book you would like to search for</h2>
+    <h2 style="text-align:center;">Please enter details of the book you would like to search for</h2>
     </p>
     <br>
     </div>
+    <div style="text-align:center;">
+        <form>
+            <input type="radio" value="ISBN" id="ISBN" name="searchBySelector" onClick="displaySearchInput(document.getElementById('ISBN').value)">ISBN
+            <br>
+            <input type="radio" value="Title" id="Title" name="searchBySelector" onClick="displaySearchInput(document.getElementById('Title').value)">Title
+            <br>
+            <input type="radio" value="Author" id="Author" name="searchBySelector" onClick="displaySearchInput(document.getElementById('Author').value)">Author
+        </form>
+    </div>
+    <br>
     <div class="col-sm-5">
-        <form action="/search" method="post">
+        <form id="searchWith" action="/search" method="post">
             <div class="form-group">
-                <input autocomplete="off" autofocus class="form-control" name="isbn" placeholder="ISBN" type="text">
+                <input autocomplete="off" style="visibility:hidden" id="isbn" autofocus class="form-control" name="isbn" placeholder="ISBN" type="text">
             </div>
             <div class="form-group">
-                <input autocomplete="off" autofocus class="form-control" name="title" placeholder="Title" type="text">
+                <input autocomplete="off" style="visibility:hidden" id="title" autofocus class="form-control" name="title" placeholder="Title" type="text">
             </div>
             <div class="form-group">
-                <input autocomplete="off" autofocus class="form-control" name="author" placeholder="Author" type="text">
+                <input autocomplete="off" style="visibility:hidden" id="author" autofocus class="form-control" name="author" placeholder="Author" type="text">
             </div>
             <button class="btn btn-primary" type="submit">Search</button>
         </form>
     </div>
+
+    <script type="text/javascript">
+        function displaySearchInput(choice) {
+            console.log(choice)
+            if (choice == "ISBN") {
+                document.getElementById("isbn").style.visibility = "visible";
+                document.getElementById("title").style.visibility = "hidden";
+                document.getElementById("author").style.visibility = "hidden";
+            }
+            else if (choice == "Title") {
+                document.getElementById("title").style.visibility = "visible";
+                document.getElementById("isbn").style.visibility = "hidden";
+                document.getElementById("author").style.visibility = "hidden";
+            }
+            else if (choice == "Author") {
+                document.getElementById("author").style.visibility = "visible";
+                document.getElementById("title").style.visibility = "hidden";
+                document.getElementById("isbn").style.visibility = "hidden";
+            } 
+        }
+    </script>
+
 {% endblock %}

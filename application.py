@@ -133,7 +133,7 @@ def search():
         isbn = request.form.get("isbn")
 
         try:
-            result = db.execute("SELECT * FROM books WHERE (isbn=:isbn)", {"isbn":isbn}).fetchall()
+            result = db.execute("SELECT DISTINCT * FROM books WHERE isbn LIKE :isbn", {"isbn":("%"+isbn+"%")}).fetchall()
             print("Search Completed")
             print(result)
 
@@ -145,7 +145,7 @@ def search():
         title = request.form.get("title")
 
         try:
-            result = db.execute("SELECT * FROM books WHERE (title=:title)", {"title":title}).fetchall()
+            result = db.execute("SELECT DISTINCT * FROM books WHERE title LIKE :title", {"title":("%"+title+"%")}).fetchall()
             print("Search Completed")
             print(result)
 
@@ -157,7 +157,7 @@ def search():
         author = request.form.get("author")
 
         try:
-            result = db.execute("SELECT * FROM books WHERE (author=:author)", {"author":author}).fetchall()
+            result = db.execute("SELECT DISTINCT * FROM books WHERE author LIKE :author", {"author":("%"+author+"%")}).fetchall()
             print("Search Completed")
             print(result)
 

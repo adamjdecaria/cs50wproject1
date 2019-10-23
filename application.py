@@ -167,5 +167,5 @@ def search():
     
     else:
         return("error.html")
-    
-    return render_template("search.html")
+   
+    return render_template("search_results.html", data=result)

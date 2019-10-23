@@ -125,7 +125,7 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
-@app.route("/search", methods= ["POST"])
+@app.route("/search", methods=["POST"])
 def search():
     """Search for books from Goodreads API using ISBN, title or author"""
 
@@ -168,4 +168,21 @@ def search():
     else:
         return("error.html")
    
+    return render_template("search_results.html", data=result)
+
+@app.route("/search_by_ISBN", methods=["POST"])
+def search_by_ISBN():
+    """Search for book selected by user via ISBN"""
+
+    isbn = request.form["choice"]
+
+    try:
+        result = db.execute("SELECT DISTINCT * FROM books WHERE isbn LIKE :isbn", {"isbn":("%"+isbn+"%")}).fetchall()
+        print("Search Completed")
+        print(result)
+
+    except exc.IntegrityError as e:
+        error_message = "Unable to find anything."
+        return render_template("error.html", message=error_message)
+    
     return render_template("search_results.html", data=result)

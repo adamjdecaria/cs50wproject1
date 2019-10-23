@@ -17,14 +17,21 @@
         <br>
     </div>
     <div style="text-align:center;">
-        {% for data in data %}    
-            <ul>
-                <li> ISBN: {{ data[0] }} </li>
-                <li> Title: {{ data[1] }} </li>
-                <li> Author: {{ data[2] }} </li>
-                <li> Year: {{ data[3] }} </li>
-            </ul>
-        {% endfor %}
+        <form id="user_choice" action="/search_by_ISBN" method="post">
+            {% for data in data %}
+                <div class="form-group">    
+                    <input type="radio" value="{{ data[0] }}" name="choice">
+                        <ul>
+                            <li> ISBN: {{ data[0] }} </li>
+                            <li> Title: {{ data[1] }} </li>
+                            <li> Author: {{ data[2] }} </li>
+                            <li> Year: {{ data[3] }} </li>
+                        </ul>
+                </div>
+                <br>    
+            {% endfor %}
+            <button class="btn btn-primary" type="submit">Select</button>
+        </form>
     </div>
 {% endblock %}
             

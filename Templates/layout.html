@@ -16,7 +16,7 @@
     .sidenav {
       background-color: #f1f1f1;
       height: 100%;
-      overflow:auto;
+      overflow: auto;
     }
     /* On small screens, set height to 'auto' for sidenav and grid */
     @media screen and (max-width: 767px) {
@@ -26,22 +26,10 @@
       }
       .row.content {height: auto;}
     }
-    .form
-    {
-    display: block;
-    text-align: center;
-    }
-    form
-    {
-    display: inline-block;
-    margin-left: auto;
-    margin-right: auto;
-    text-align: left;
-    }
 
     .search_results {
-    height: 1000px;
-    overflow: scroll;
+      height: 500px;
+      overflow: scroll;
   }
   </style>
 </head>
@@ -63,22 +51,11 @@
         <li><a class="nav-link" href="logout">Logout</a></li>
         {% endif %}
       </ul><br>
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="Search Books..">
-        <span class="input-group-btn">
-          <button class="btn btn-default" type="button">
-            <span class="glyphicon glyphicon-search"></span>
-          </button>
-        </span>
-      </div>
     </div>
       {% block main %}
       {% endblock %}
   </div>
 </div>
-
-<footer class="container-fluid">
-</footer>
 
 </body>
 </html>

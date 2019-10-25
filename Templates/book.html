@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Book Details and Reviews
+{% endblock %}
+
+{% block main %}  
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                 <div class="alert alert-success" role="alert"><div class="text-center">{{ messages }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+<br>
+<br>
+<p>
+    <div>
+        <h2 style = "text-align:center;"> Please see details about the book and reviews below </h2>
+    </div>
+</p>
+<br>
+<br>
+<p>
+    <div style="text-align:center;">
+        {% for data in data %}
+            <ul>
+                <li> ISBN: {{ data[0] }} </li>
+                <li> Title: {{ data[1] }} </li>
+                <li> Author: {{ data[2] }} </li>
+                <li> Year: {{ data[3] }} </li>
+            </ul>
+        {% endfor %}
+    </div>
+</p>
+<br>
+<br>
+<p>
+    <div style="text-align:center">
+        <form id="reviewInput" action="/submitReview" method="post">
+            <div class="form-group">
+                <textarea rows="6" name="review" style="width: 750px; height=150px;"> Please enter your review here. </textarea>
+            </div>
+            <div class="form-group">
+                <input autocomplete="off" name="isbn" value="{{ data[0][0] }}" type="hidden">
+            </div>
+            <button class="btn btn-primary" type="submit">Submit</button>
+        </form>
+    </div>
+</p>  
+
+{% endblock %}
+            
+

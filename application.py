@@ -185,4 +185,32 @@ def search_by_ISBN():
         error_message = "Unable to find anything."
         return render_template("error.html", message=error_message)
     
-    return render_template("search_results.html", data=result)
+    return render_template("book.html", data=result)
+
+@app.route("/submitReview", methods=["POST"])
+def submitReview():
+    """Submit a review for a book and add it ot the database"""
+
+    isbn = request.form.get("isbn")
+    review = request.form.get("review")
+    username = session["username"]
+
+    try:
+        db.execute("INSERT INTO reviews (isbn, username, review) VALUES(:isbn, :username, :review)", 
+                        {"isbn": isbn, "username": username, "review": review})
+        db.commit()
+        
+    except exc.IntegrityError as e:
+        error_message = "Oops! Review was not recorded."
+        session.clear()
+        return render_template("error.html", message=error_message)
+
+    try:
+        result = db.execute("SELECT DISTINCT * FROM books WHERE isbn LIKE :isbn", {"isbn":("%"+isbn+"%")}).fetchall()
+        print("Search Completed")
+     
+    except exc.IntegrityError as e:
+        error_message = "Unable to find anything."
+        return render_template("error.html", message=error_message)
+
+    return render_template("book.html", message="Review submitted!", data=result)

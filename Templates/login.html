@@ -5,12 +5,10 @@
 {% endblock %}
 
 {% block main %}
-    <br>
-    <br>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
-                 <div class="alert alert-success" role="alert"><div class="text-center">{{ messages }}</div>
+                 <div class="alert alert-success" role="alert" style="text-align:center;">{{ messages }}</div>
             {% endfor %}
         {% endif %}
     {% endwith %}

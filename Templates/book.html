@@ -42,13 +42,20 @@
                 <textarea rows="6" name="review" style="width: 750px; height=150px;"> Please enter your review here. </textarea>
             </div>
             <div class="form-group">
+                <select>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+            <div class="form-group">
                 <input autocomplete="off" name="isbn" value="{{ data[0][0] }}" type="hidden">
             </div>
             <button class="btn btn-primary" type="submit">Submit</button>
         </form>
     </div>
 </p>  
-<br>
 <br>
 <p>
     <div style="text-align:center;">

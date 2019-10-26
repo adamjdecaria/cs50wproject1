@@ -5,20 +5,16 @@
 {% endblock %}
 
 {% block main %}
-<main class="container p-5">
 
-<div class="search_results">
-    <br>
-    <br>
-    <br>
-    <br>
-    <div>
-        <p style="text-align:center;">
+<br>
+<br>
+<div>
+    <p>
         <h2 style="text-align:center;"> There were several partial matching results.  Please select from the below.</h2>
-        </p>
-        <br>
+    </p>
+    <br>
     </div>
-    <div style="text-align:center;">
+    <div style="text-align:center;" class="search_results">
         <form id="user_choice" action="/search_by_ISBN" method="post">
             {% for data in data %}
                 <div class="form-group">    

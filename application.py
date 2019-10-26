@@ -125,9 +125,12 @@ def logout():
     # Redirect user to login form
     return redirect("/")
 
-@app.route("/search", methods=["POST"])
+@app.route("/search", methods=["GET", "POST"])
 def search():
     """Search for books from Goodreads API using ISBN, title or author"""
+
+    if request.method == "GET":
+        return render_template("search.html")
 
     if request.form.get("isbn"):
         isbn = request.form.get("isbn")
@@ -182,10 +185,17 @@ def search_by_ISBN():
         print(result)
 
     except exc.IntegrityError as e:
-        error_message = "Unable to find anything."
-        return render_template("error.html", message=error_message)
+        flash("Unable to find anything.")
+        return render_template("error.html")
     
-    return render_template("book.html", data=result)
+    try:
+        reviews = db.execute("SELECT * FROM reviews WHERE isbn=:isbn", {"isbn":isbn}).fetchall()
+    
+    except:
+        flash("Unable to find anything.")
+        return render_template("error.html")
+    
+    return render_template("book.html", data=result, reviews=reviews)
 
 @app.route("/submitReview", methods=["POST"])
 def submitReview():
@@ -212,5 +222,13 @@ def submitReview():
     except exc.IntegrityError as e:
         error_message = "Unable to find anything."
         return render_template("error.html", message=error_message)
+    
+    try:
+        reviews = db.execute("SELECT * FROM reviews WHERE isbn=:isbn", {"isbn":isbn}).fetchall()
+    
+    except:
+        flash("Unable to find anything.")
+        return render_template("error.html")
 
-    return render_template("book.html", message="Review submitted!", data=result)
+    flash("Review submitted!")
+    return render_template("book.html", data=result, reviews=reviews)

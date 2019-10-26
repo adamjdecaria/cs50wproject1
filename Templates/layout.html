@@ -41,9 +41,11 @@
       <h4>Book Talk - Book Reviews and Discussion</h4>
       <ul class="nav nav-pills nav-stacked">
         {% if session.user_id %}
-        <li class="nav-link"><a href="/">Home</a></li>
+        <li class="nav-link"><a href="/search">Search</a></li>
         {% endif %}
+        {% if not session.user_id %}
         <li><a class="nav-link" href="/register">Register</a></li>
+        {% endif %}
         {% if not session.user_id %}
         <li><a hclass="nav-link" href="/login">Login</a></li>
         {% endif %}

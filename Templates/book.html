@@ -8,7 +8,7 @@
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
-                 <div class="alert alert-success" role="alert"><div class="text-center">{{ messages }}</div>
+                 <div class="alert alert-success" role="alert" style="text-align:center;">{{ messages }}</div>
             {% endfor %}
         {% endif %}
     {% endwith %}
@@ -16,7 +16,7 @@
 <br>
 <p>
     <div>
-        <h2 style = "text-align:center;"> Please see details about the book and reviews below </h2>
+        <h2 style="text-align:center;"> Please see details about the book and reviews below </h2>
     </div>
 </p>
 <br>
@@ -36,7 +36,7 @@
 <br>
 <br>
 <p>
-    <div style="text-align:center">
+    <div style="text-align:center;">
         <form id="reviewInput" action="/submitReview" method="post">
             <div class="form-group">
                 <textarea rows="6" name="review" style="width: 750px; height=150px;"> Please enter your review here. </textarea>
@@ -48,6 +48,24 @@
         </form>
     </div>
 </p>  
+<br>
+<br>
+<p>
+    <div style="text-align:center;">
+        <h2 style="text-align:center;"> Reviews from Readers</h2>
+        <br>
+        <p>
+        {% if reviews %}
+            <ul>
+            {% for review in reviews %}
+                <li>{{ review[2] }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+        <br>
+        </p>
+    </div>
+</p>
 
 {% endblock %}
             

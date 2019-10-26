@@ -163,8 +163,6 @@ def search():
 
         try:
             result = db.execute("SELECT DISTINCT * FROM books WHERE LOWER(author) LIKE :author", {"author":("%"+author+"%")}).fetchall()
-            print("Search Completed")
-            print(result)
 
         except exc.IntegrityError as e:
             error_message = "Unable to find anything."
@@ -206,24 +204,37 @@ def submitReview():
     isbn = request.form.get("isbn")
     review = request.form.get("review")
     username = session["username"]
+    score = request.form.get("score")
 
     try:
-        db.execute("INSERT INTO reviews (isbn, username, review) VALUES(:isbn, :username, :review)", 
-                        {"isbn": isbn, "username": username, "review": review})
+        result = db.execute("SELECT * FROM reviews WHERE username=:username AND isbn=:isbn", {"username":username, "isbn":isbn}).fetchall()
+    
+    except:
+        flash("Something went wrong.")
+        return render_template("error.html")
+    
+    if len(result) != 0:
+        flash("Thank you - but you have already reviewed this title!")
+        return render_template("search.html")
+
+    try:
+        db.execute("INSERT INTO reviews (isbn, username, review, score) VALUES(:isbn, :username, :review, :score)", 
+                        {"isbn": isbn, "username": username, "review": review, "score": score})
         db.commit()
         
     except exc.IntegrityError as e:
-        error_message = "Oops! Review was not recorded."
         session.clear()
-        return render_template("error.html", message=error_message)
+        flash("Oops! Review was not recorded.")
+        return render_template("error.html")
 
     try:
         result = db.execute("SELECT DISTINCT * FROM books WHERE isbn LIKE :isbn", {"isbn":("%"+isbn+"%")}).fetchall()
         print("Search Completed")
      
     except exc.IntegrityError as e:
-        error_message = "Unable to find anything."
-        return render_template("error.html", message=error_message)
+        session.clear()
+        flash("Unable to find anything.")
+        return render_template("error.html")
     
     try:
         reviews = db.execute("SELECT * FROM reviews WHERE isbn=:isbn", {"isbn":isbn}).fetchall()

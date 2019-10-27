@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, session, flash, jsonify, redirect, render_template, request
+from flask import Flask, session, flash, jsonify, redirect, render_template, request, abort
 from flask_session import Session
 from sqlalchemy import create_engine, exc
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -278,3 +278,32 @@ def submitReview():
 
     flash("Review submitted!")
     return render_template("book.html", data=result, reviews=reviews, goodreads=book_data)
+
+@app.route("/api/<isbn>", methods=["GET"])
+def externalQuery(isbn):
+    """Handle an external GET request and return JSON data for isbn passed into route"""
+
+    # Search DB with ISBN only to pull book page with only selected isbn
+    try:
+        result = db.execute("SELECT DISTINCT * FROM books WHERE isbn LIKE :isbn", {"isbn":("%"+isbn+"%")}).fetchall()
+
+    except exc.IntegrityError as e:
+        flash("Unable to find anything.")
+        return render_template("error.html")
+    
+    if not result:
+        return abort(404)
+
+    try:
+        data = urlopen("https://www.goodreads.com/book/review_counts.json?isbns=%s&key=%s" % (isbn, key))
+        data = json.loads(data.read())
+        book_data = data['books']
+
+    except:
+        flash("Something went wrong.")
+        return render_template("error.html")
+    
+    return jsonify(title=result[0][1], author=result[0][2], year=result[0][3], isbn=isbn, review_count=book_data[0]["reviews_count"], 
+                        average_score=book_data[0]["average_rating"])
+
+

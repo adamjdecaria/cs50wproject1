@@ -7,6 +7,8 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
+import urllib.request, json
+from urllib.request import urlopen
 
 app = Flask(__name__)
 
@@ -33,6 +35,13 @@ def after_request(response):
 # Set up database
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
+
+# GoodReads API key must be imported
+if not os.getenv("GOODREADS_KEY"):
+    raise RuntimeError("Please set GOODREADS_KEY")
+
+# Save GoodReads key for later use
+key = os.getenv("GOODREADS_KEY")
 
 @app.route("/")
 def index():
@@ -134,39 +143,41 @@ def search():
     if request.method == "GET":
         return render_template("search.html")
 
-    if request.form.get("isbn"):
-        isbn = request.form.get("isbn")
+    if request.method == "POST":
 
-        try:
-            result = db.execute("SELECT DISTINCT * FROM books WHERE isbn LIKE :isbn", {"isbn":("%"+isbn+"%")}).fetchall()
-            print("Search Completed")
-            print(result)
+        if request.form.get("isbn"):
+            isbn = request.form.get("isbn")
 
-        except exc.IntegrityError as e:
-            error_message = "Unable to find anything."
-            return render_template("error.html", message=error_message)
+            try:
+                result = db.execute("SELECT DISTINCT * FROM books WHERE isbn LIKE :isbn", {"isbn":("%"+isbn+"%")}).fetchall()
+                print("Search Completed")
+                print(result)
+
+            except exc.IntegrityError as e:
+                error_message = "Unable to find anything."
+                return render_template("error.html", message=error_message)
        
-    elif request.form.get("title"):
-        title = request.form.get("title")
+        elif request.form.get("title"):
+            title = request.form.get("title")
 
-        try:
-            result = db.execute("SELECT DISTINCT * FROM books WHERE LOWER(title) LIKE :title", {"title":("%"+title+"%")}).fetchall()
-            print("Search Completed")
-            print(result)
+            try:
+                result = db.execute("SELECT DISTINCT * FROM books WHERE LOWER(title) LIKE :title", {"title":("%"+title+"%")}).fetchall()
+                print("Search Completed")
+                print(result)
 
-        except exc.IntegrityError as e:
-            error_message = "Unable to find anything."
-            return render_template("error.html", message=error_message)
+            except exc.IntegrityError as e:
+                error_message = "Unable to find anything."
+                return render_template("error.html", message=error_message)
 
-    elif request.form.get("author"):
-        author = request.form.get("author")
+        elif request.form.get("author"):
+            author = request.form.get("author")
 
-        try:
-            result = db.execute("SELECT DISTINCT * FROM books WHERE LOWER(author) LIKE :author", {"author":("%"+author+"%")}).fetchall()
+            try:
+                result = db.execute("SELECT DISTINCT * FROM books WHERE LOWER(author) LIKE :author", {"author":("%"+author+"%")}).fetchall()
 
-        except exc.IntegrityError as e:
-            error_message = "Unable to find anything."
-            return render_template("error.html", message=error_message)
+            except exc.IntegrityError as e:
+                error_message = "Unable to find anything."
+                return render_template("error.html", message=error_message)
     
     else:
         return("error.html")
@@ -179,33 +190,44 @@ def search_by_ISBN():
 
     isbn = request.form["choice"]
 
+    # Search DB with ISBN only to pull book page with only selected isbn
     try:
         result = db.execute("SELECT DISTINCT * FROM books WHERE isbn LIKE :isbn", {"isbn":("%"+isbn+"%")}).fetchall()
-        print("Search Completed")
-        print(result)
 
     except exc.IntegrityError as e:
         flash("Unable to find anything.")
         return render_template("error.html")
     
+    # Pull user reviews for selected isbn
     try:
         reviews = db.execute("SELECT * FROM reviews WHERE isbn=:isbn", {"isbn":isbn}).fetchall()
     
     except:
         flash("Unable to find anything.")
         return render_template("error.html")
-    
-    return render_template("book.html", data=result, reviews=reviews)
+
+    # Pull GoodReads data for selected isbn
+    try:
+        data = urlopen("https://www.goodreads.com/book/review_counts.json?isbns=%s&key=%s" % (isbn, key))
+        data = json.loads(data.read())
+        book_data = data['books']
+
+    except:
+        flash("Something went wrong.")
+        return render_template("error.html")
+   
+    return render_template("book.html", data=result, reviews=reviews, goodreads = book_data)
 
 @app.route("/submitReview", methods=["POST"])
 def submitReview():
-    """Submit a review for a book and add it ot the database"""
+    """Submit a review for a book and add it to the database"""
 
     isbn = request.form.get("isbn")
     review = request.form.get("review")
     username = session["username"]
     score = request.form.get("score")
 
+    # Check if this user has already reviewed this book
     try:
         result = db.execute("SELECT * FROM reviews WHERE username=:username AND isbn=:isbn", {"username":username, "isbn":isbn}).fetchall()
     
@@ -217,6 +239,7 @@ def submitReview():
         flash("Thank you - but you have already reviewed this title!")
         return render_template("search.html")
 
+    # Insert new review into DB
     try:
         db.execute("INSERT INTO reviews (isbn, username, review, score) VALUES(:isbn, :username, :review, :score)", 
                         {"isbn": isbn, "username": username, "review": review, "score": score})
@@ -227,10 +250,10 @@ def submitReview():
         flash("Oops! Review was not recorded.")
         return render_template("error.html")
 
+    # Pull fresh page with new review
     try:
         result = db.execute("SELECT DISTINCT * FROM books WHERE isbn LIKE :isbn", {"isbn":("%"+isbn+"%")}).fetchall()
-        print("Search Completed")
-     
+            
     except exc.IntegrityError as e:
         session.clear()
         flash("Unable to find anything.")
@@ -242,6 +265,16 @@ def submitReview():
     except:
         flash("Unable to find anything.")
         return render_template("error.html")
+    
+    # Pull GoodReads data for selected isbn
+    try:
+        data = urlopen("https://www.goodreads.com/book/review_counts.json?isbns=%s&key=%s" % (isbn, key))
+        data = json.loads(data.read())
+        book_data = data['books']
+
+    except:
+        flash("Something went wrong.")
+        return render_template("error.html")
 
     flash("Review submitted!")
-    return render_template("book.html", data=result, reviews=reviews)
+    return render_template("book.html", data=result, reviews=reviews, goodreads=book_data)

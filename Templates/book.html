@@ -79,6 +79,21 @@
         </p>
     </div>
 </p>
+<br>
+<p>
+    <div style="text-align:center;">
+        <h2 style="text-align:center;"> From Goodreads</h2>
+        <br>
+        <p>
+        {% if goodreads %}
+            <ul>
+                <li> <strong>Number of Ratings:</strong> {{ goodreads[0]['ratings_count'] }}</li>
+                <li><strong>Average Rating:</strong> {{ goodreads[0]['average_rating'] }}</li>
+            </ul>
+        {% endif %}
+        </p>
+    </div>
+</p> 
 
 {% endblock %}
             
